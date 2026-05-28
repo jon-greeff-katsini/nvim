@@ -1,3 +1,5 @@
+vim.pack.add { { src = 'https://github.com/goolord/alpha-nvim', name = 'alpha-nvim' } }
+
 local alpha = require('alpha')
 local dashboard = require('alpha.themes.dashboard')
 
