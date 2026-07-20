@@ -5,7 +5,7 @@ vim.pack.add {
 require('blink.cmp').setup {
   -- 'default' = C-y to accept, C-n/C-p or arrows to navigate,
   -- C-space to open the menu, C-e to hide it.
-  keymap = { preset = 'default' },
+  keymap = { preset = 'super-tab' },
 
   appearance = { nerd_font_variant = 'mono' },
 

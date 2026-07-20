@@ -43,6 +43,9 @@ end
 
 -- basedpyright: type checking + completion
 vim.lsp.config('basedpyright', {
+  cmd = { 'basedpyright-langserver', '--stdio' },
+  filetypes = { 'python' },
+  root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile', '.git' },
   settings = {
     basedpyright = {
       analysis = {
@@ -70,9 +73,22 @@ vim.api.nvim_create_user_command('VenvSet', function(opts)
 end, { nargs = 1, complete = 'file' })
 
 -- ruff: fast linting + formatting
-vim.lsp.config('ruff', {})
+vim.lsp.config('ruff', {
+  cmd = { 'ruff', 'server' },
+  filetypes = { 'python' },
+  root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
+})
 
 vim.lsp.enable { 'basedpyright', 'ruff' }
+
+-- Virtual text can't wrap (it's a single-line extmark, so it clips at the window
+-- edge). Show it everywhere except the cursor line, and give the cursor line the
+-- virtual_lines handler, which renders as real screen lines and wraps.
+vim.diagnostic.config {
+  virtual_text = { current_line = false, source = 'if_many' },
+  virtual_lines = { current_line = true },
+  float = { border = 'rounded', source = 'if_many' },
+}
 
 -- LSP keymaps, set when a server attaches to a buffer
 vim.api.nvim_create_autocmd('LspAttach', {
