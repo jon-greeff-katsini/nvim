@@ -1,6 +1,7 @@
 require('plugins.catppuccin')
 require('plugins.alpha')
 require('plugins.nvim-tree')
+require('plugins.lualine')
 require('plugins.telescope')
 require('plugins.markview')
 require('plugins.completion')
