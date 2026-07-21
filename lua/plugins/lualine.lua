@@ -5,7 +5,7 @@ vim.pack.add {
 
 require('lualine').setup {
   options = {
-    theme = 'catppuccin',
+    theme = 'auto',
     icons_enabled = true,
     globalstatus = true,
     section_separators = { left = '', right = '' },
