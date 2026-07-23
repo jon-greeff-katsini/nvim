@@ -6,36 +6,33 @@ Personal Neovim config using the built-in `vim.pack` plugin manager (no lazy.nvi
 
 - `init.lua` — loads `options` → `keymaps` → `plugins`
 - `lua/options.lua` — editor options (relative numbers, smart search, system clipboard, cursorline)
-- `lua/keymaps.lua` — leader = space; arrow keys disabled (hjkl only)
+- `lua/keymaps.lua` — leader = space
 - `lua/plugins/` — one file per plugin, loaded from `lua/plugins/init.lua`
 
 ## Plugins
 
+- **alpha-nvim** — start screen (stock `startify` theme)
 - **catppuccin** — colorscheme
-- **alpha-nvim** — start screen
-- **nvim-tree** — file explorer (`<leader>e`)
-- **lualine** — statusline (catppuccin theme)
-- **telescope** — fuzzy finder
-- **nvim-treesitter** — syntax highlighting (python, toml, json, yaml, bash, lua, markdown)
-- **markview** — inline markdown rendering
-- **blink.cmp** — completion
-- **mason** + LSP — `basedpyright` and `ruff` enabled via `vim.lsp.enable`
+- **lualine** — statusline (`catppuccin-nvim` theme, global statusline, no separators)
+- **telescope** — fuzzy finder, plus the **telescope-file-browser** extension
+- **nvim-treesitter** — syntax highlighting (installs python, toml, json, yaml, bash; also started for lua and markdown)
 
 ## Keybindings
 
 | Key | Action |
 |-----|--------|
-| `<leader>e` | Toggle file tree |
+| `<leader>e` | netrw (`:Ex`) |
+| `<leader>o` | File browser (telescope), opens at the current file's directory |
 | `<leader>ff` | Find files |
 | `<leader>fg` | Live grep |
 | `<leader>fb` | Buffers |
 | `<leader>fh` | Help tags |
-| `gd` / `gr` | Go to definition / references |
-| `K` | Hover docs |
-| `<leader>rn` | Rename symbol |
-| `<leader>ca` | Code action |
-| `<leader>f` | Format buffer |
-| `[d` / `]d` | Prev / next diagnostic |
+
+### Inside the file browser
+
+Press `<Esc>` for normal mode, then: `c` create (trailing `/` makes a folder), `r` rename,
+`d` delete, `m` move, `y` copy, `g` parent dir, `h` toggle hidden files.
+Insert-mode equivalents use Alt (`<A-c>` etc.) — unreliable in macOS terminals.
 
 ## Adding a plugin
 

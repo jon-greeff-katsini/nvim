@@ -1,3 +1,5 @@
+require('plugins.alpha')
 require('plugins.catppuccin')
+require('plugins.lualine')
 require('plugins.telescope')
 require('plugins.treesitter')
