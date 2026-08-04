@@ -24,7 +24,15 @@ vim.keymap.set('n', '<leader>o', function()
   telescope.extensions.file_browser.file_browser { path = '%:p:h', select_buffer = true }
 end, { noremap = true })
 
-vim.keymap.set('n', '<leader>ff', builtin.find_files, { noremap = true })
+vim.keymap.set('n', '<leader>ff', function()
+  local ok = pcall(builtin.git_files, { show_untracked = true })
+  if not ok then
+    builtin.find_files()
+  end
+end, { noremap = true })
+vim.keymap.set('n', '<leader>fa', function()
+  builtin.find_files { hidden = true, no_ignore = true, no_ignore_parent = true }
+end, { noremap = true })
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, { noremap = true })
 vim.keymap.set('n', '<leader>fb', builtin.buffers, { noremap = true })
 vim.keymap.set('n', '<leader>fh', builtin.help_tags, { noremap = true })
