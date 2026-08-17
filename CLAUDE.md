@@ -14,7 +14,6 @@ This is a Neovim configuration repository (`~/.config/nvim`) that manages editor
 - **`lua/plugins/`**: Plugin configurations
   - `init.lua`: Requires all plugin modules
   - `catppuccin.lua`: Color scheme setup
-  - `alpha.lua`: Dashboard plugin for startup screen
   - `nvim-tree.lua`: File explorer with icons
 - **`nvim-pack-lock.json`**: Lock file tracking exact plugin revisions (similar to a package-lock.json)
 
@@ -24,7 +23,6 @@ This configuration uses Neovim's native `vim.pack` system (no external package m
 
 **Key plugins:**
 - **catppuccin**: Color scheme
-- **alpha-nvim**: Dashboard/start screen
 - **nvim-tree.lua**: File tree explorer
 - **nvim-web-devicons**: Icon support
 
@@ -48,4 +46,4 @@ The lock file pins exact commits. Update manually by editing `nvim-pack-lock.jso
 
 - Leader key is space (set in `keymaps.lua`)
 - All configuration is Lua-based (no Vimscript)
-- Plugins are loaded in order: catppuccin → alpha → nvim-tree (order matters for dependencies)
+- Plugins are loaded in order: catppuccin → nvim-tree (order matters for dependencies)

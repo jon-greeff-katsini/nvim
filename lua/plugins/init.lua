@@ -1,4 +1,3 @@
-require('plugins.alpha')
 require('plugins.catppuccin')
 require('plugins.blink')
 require('plugins.lsp')
