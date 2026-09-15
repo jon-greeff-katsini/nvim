@@ -1,5 +1,6 @@
 require('plugins.catppuccin')
 require('plugins.blink')
+require('plugins.copilot')
 require('plugins.lsp')
 require('plugins.lualine')
 require('plugins.telescope')
