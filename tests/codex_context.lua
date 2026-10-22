@@ -1,0 +1,36 @@
+vim.opt.rtp:prepend(vim.fn.getcwd())
+local context = require('codex.context')
+local function eq(expected, actual)
+  assert(vim.deep_equal(expected, actual), vim.inspect { expected = expected, actual = actual })
+end
+
+local buf = vim.api.nvim_create_buf(false, true)
+vim.api.nvim_buf_set_name(buf, '/tmp/codex-context-example.lua')
+vim.api.nvim_buf_set_lines(buf, 0, -1, false, { 'local café = 1', 'print(café)', 'return café' })
+vim.api.nvim_set_current_buf(buf)
+
+local file = context.file(buf)
+eq('local café = 1\nprint(café)\nreturn café', file.text)
+vim.api.nvim_buf_set_lines(buf, 0, 1, false, { 'changed' })
+eq('local café = 1\nprint(café)\nreturn café', file.text)
+
+local selection = context.selection(buf, { 0, 3, 1, 0 }, { 0, 2, 1, 0 }, 'V')
+eq('print(café)\nreturn café', selection.text)
+eq(2, selection.first)
+eq(3, selection.last)
+eq('rint', context.selection(buf, { 0, 2, 2, 0 }, { 0, 2, 5, 0 }, 'v').text)
+eq('café', context.selection(buf, { 0, 2, 7, 0 }, { 0, 2, 11, 0 }, 'v').text)
+eq('ch\npr', context.selection(buf, { 0, 1, 1, 0 }, { 0, 2, 2, 0 }, '\22').text)
+
+local items = {}
+context.add(items, file)
+context.add(items, selection)
+eq(2, #items)
+context.add(items, context.file(buf))
+eq(2, #items)
+eq('changed\nprint(café)\nreturn café', items[1].text)
+assert(context.format('Explain this', items):find('lines 2–3', 1, true))
+assert(context.format('Explain this', items):find(selection.text, 1, true))
+eq('Explain this', context.format('Explain this', {}))
+eq('safe[201~text', context.clean('safe\27[201~text\0'))
+print('Codex context: all checks passed')
