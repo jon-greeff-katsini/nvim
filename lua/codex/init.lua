@@ -144,8 +144,18 @@ local function start_terminal()
   end
   if not state.bridge then
     state.bridge = require('codex.bridge').new(function()
+      local consumed = state.attachments
       state.attachments = {}
       update_context()
+      local called = {}
+      for _, item in ipairs(consumed) do
+        local callback = item.on_submitted
+        if callback and not called[callback] then
+          called[callback] = true
+          local ok, err = pcall(callback)
+          if not ok then notify('Could not clear submitted review comments: ' .. tostring(err), vim.log.levels.ERROR) end
+        end
+      end
     end)
     state.bridge.publish(state.attachments)
   end
@@ -186,7 +196,12 @@ local function start_terminal()
   return true
 end
 
-function M.open()
+function M.open(root)
+  if root and state.job and vim.fn.jobwait({ state.job }, 0)[1] == -1
+    and (vim.uv.fs_realpath(state.cwd) or state.cwd) ~= (vim.uv.fs_realpath(root) or root) then
+    notify('The running Codex session belongs to ' .. state.cwd .. '. Review feedback was kept.', vim.log.levels.WARN)
+    return false
+  end
   if valid(state.term_win) then
     M.focus_terminal()
     return true
@@ -199,7 +214,7 @@ function M.open()
   state.source_win = vim.api.nvim_get_current_win()
   local path = vim.api.nvim_buf_get_name(0)
   if not state.job then
-    state.cwd = (path ~= '' and vim.fs.root(path, '.git')) or vim.fn.getcwd()
+    state.cwd = root or (path ~= '' and vim.fs.root(path, '.git')) or vim.fn.getcwd()
   end
   if not start_terminal() then return false end
   if not state.preview or not vim.api.nvim_buf_is_valid(state.preview) then
@@ -216,6 +231,30 @@ function M.open()
   vim.wo[state.preview_win].cursorline = true
   update_context()
   M.focus_terminal()
+  return true
+end
+
+-- Paste only; the user submits through Codex's own input when ready.
+function M.paste_review(prompt, attachments, root, on_submitted)
+  if not M.open(root) then return false end
+  local input
+  for _, line in ipairs(vim.api.nvim_buf_get_lines(state.terminal, 0, -1, false)) do
+    local candidate = line:match('^%s*›%s?(.*)')
+    if candidate then input = candidate end
+  end
+  if not input or input:match('^%d+[%.%)]') or input:match('^/') then
+    notify('Finish Codex setup or close its menu, then send the review again. Your comments are kept.', vim.log.levels.WARN)
+    return false
+  end
+  local ok = pcall(vim.api.nvim_chan_send, state.job, '\27[200~\n\n' .. context.clean(prompt) .. '\27[201~')
+  if not ok then
+    notify('Could not fill Codex input. Your review comments are kept.', vim.log.levels.ERROR)
+    return false
+  end
+  for _, item in ipairs(attachments) do
+    context.add(state.attachments, vim.tbl_extend('force', {}, item, { on_submitted = on_submitted }))
+  end
+  sync_context()
   return true
 end
 

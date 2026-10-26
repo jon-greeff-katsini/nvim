@@ -14,7 +14,7 @@ vim.fn.writefile({
   'from pathlib import Path',
   'assert any("hooks.UserPromptSubmit" in arg for arg in sys.argv)',
   'tty.setraw(0)',
-  'print("Ready", flush=True)',
+  'print("Ready\\r\\n› ", end="", flush=True)',
   'pending = b""',
   'with open(sys.argv[1], "w", buffering=1) as output:',
   '    while True:',
@@ -25,7 +25,8 @@ vim.fn.writefile({
   '            line, _, pending = pending.partition(b"\\r")',
   '            if line.startswith(b"/"): continue',
   '            result = subprocess.run([sys.executable, sys.argv[2]], input="{}", text=True, capture_output=True, check=True)',
-  '            output.write(json.dumps({"prompt": line.decode(), "hook": json.loads(result.stdout) if result.stdout else None}) + "\\n")',
+  '            prompt = line.decode().replace("\\x1b[200~", "").replace("\\x1b[201~", "")',
+  '            output.write(json.dumps({"prompt": prompt, "hook": json.loads(result.stdout) if result.stdout else None}) + "\\n")',
 }, fake)
 popup.setup { command = { 'python3', '-u', fake, received, vim.fn.getcwd() .. '/lua/codex/attach.py' } }
 local function wait_for(fn, message)
@@ -107,6 +108,23 @@ wait_for(function() return preview_text():find('No attachments', 1, true) end, '
 vim.api.nvim_chan_send(job, 'Next prompt\r')
 wait_for(function() return #submissions() == 3 end, 'follow-up did not submit')
 assert(submissions()[3].hook == vim.NIL, 'context must only be delivered once')
+
+local review_files = { { key = 'review:test', label = 'example.lua · new side · lines 1–2', first = 1, text = 'review snapshot' } }
+local review_submitted = 0
+assert(not popup.paste_review('Wrong repository', review_files, '/another/repository'), 'must reject a different repository')
+assert(popup.paste_review('Please address my review comments', review_files, vim.fn.getcwd(), function()
+  review_submitted = review_submitted + 1
+end), 'review must fill the native input')
+vim.wait(200, function() return false end, 10)
+assert(#submissions() == 3, 'review staging must never press Enter')
+assert(review_submitted == 0, 'staging must not clear review comments')
+assert(preview_text():find('review snapshot', 1, true), 'review attachments must be visible before submission')
+vim.api.nvim_chan_send(job, '\r')
+wait_for(function() return #submissions() == 4 end, 'user Enter must submit staged review')
+assert(submissions()[4].prompt:find('Please address my review comments', 1, true), 'native input must contain review feedback')
+assert(submissions()[4].hook.hookSpecificOutput.additionalContext:find('review snapshot', 1, true), 'review attachments must accompany user submission')
+wait_for(function() return preview_text():find('No attachments', 1, true) end, 'submitted review attachments must clear')
+assert(review_submitted == 1, 'hook receipt must acknowledge the submitted review exactly once')
 
 popup.hide()
 vim.api.nvim_set_current_buf(source)

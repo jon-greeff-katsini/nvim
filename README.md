@@ -16,6 +16,7 @@ Personal Neovim config using the built-in `vim.pack` plugin manager (no lazy.nvi
 - **lualine** — statusline (`catppuccin-nvim` theme, global statusline, no separators)
 - **telescope** — fuzzy finder, plus the **telescope-file-browser** extension
 - **nvim-treesitter** — syntax highlighting (installs python, toml, json, yaml, bash; also started for lua and markdown)
+- **codediff.nvim + review.nvim**: changed-file tree, side-by-side diffs, and local review comments sent to Codex
 
 ## Keybindings
 
@@ -67,6 +68,47 @@ Checks (Neovim 0.12+, Python 3, and the installed Telescope/Plenary plugins):
 nvim --clean --headless -l tests/codex_context.lua
 nvim --clean --headless -l tests/codex_terminal.lua
 python3 tests/codex_hook.py
+```
+
+## Review changes with Codex
+
+`Space c r` opens a local code review: a changed-file tree, side-by-side diffs, and inline comments. Git supplies the change list; staging and discard shortcuts are disabled in this view.
+
+| Key | Action |
+|-----|--------|
+| `<leader>cr` | Open the review view |
+| `i` on a diff line | Add a typed review comment |
+| `v` / `V`, select code, then `i` | Comment on exact text / a range of lines |
+| `F` in a diff pane | Comment on the whole file |
+| `e` / `d` | Edit / delete the comment at the cursor |
+| `c` | List comments |
+| `j` / `k` in the file tree | Move through entries |
+| `<Enter>` in the file tree | Open the selected diff and focus its new side |
+| `<Tab>` / `<S-Tab>` | Switch directly between the tree and diff |
+| `[` / `]` | Previous / next changed file |
+| `r` | Mark the file reviewed and move on |
+| `<leader>sr` or `:ReviewCodex` | Put feedback and file attachments into Codex |
+| `q` | Return to the file tree; close the review when already in the tree |
+
+- In a comment popup, `Ctrl-C` saves and closes; `Esc` discards the unsaved draft. Neither action sends anything to Codex. On a commented line, `d` deletes the saved comment after confirmation.
+- Character selections include the exact selected text and columns in Codex's feedback. Whole-line selections retain their line range. `h` and `l` keep their normal cursor movement; use `Tab` to switch between the tree and diff.
+- Sending a review fills Codex's native input. Edit the feedback there and press Enter when ready. It never submits automatically, exports a Markdown file, or changes your clipboard.
+- The attachment panel contains the commented excerpts with filenames, line numbers, diff sides, and revisions, plus one current snapshot of each available file, including unsaved edits.
+- Excerpts capture the code when the comment is created, so feedback on removed or changed lines keeps its original context. Deleted files still have their reviewed excerpt.
+- Comments and excerpts persist in review.nvim's local per-repository JSON store. Closing or staging a review keeps them. After you press Enter in Codex and the attachment hook consumes the review, submitted comments are archived and cleared. Comments added or edited since staging stay available. `:Review clear` also archives and clears comments manually.
+- If Codex needs setup or hook approval, finish that first and press `Space s r` again. The review stays available. Feedback is refused if your existing Codex session belongs to another repository.
+
+```text
+Changed-file tree + diff → Comments → Space s r → Codex input + file context
+                                                 ↓
+                                            Edit → Enter
+```
+
+Review checks (the UI check creates an isolated temporary Git repository):
+
+```sh
+nvim --clean --headless -l tests/codex_review.lua
+nvim --clean --headless -l tests/codex_review_ui.lua
 ```
 
 ## Adding a plugin
