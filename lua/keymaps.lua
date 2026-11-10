@@ -52,9 +52,9 @@ local function resize_mode()
   }
   while true do
     vim.cmd.redraw()
-    vim.api.nvim_echo({ { "-- RESIZE -- hjkl to resize, Ctrl-C to exit" } }, false, {})
+    vim.api.nvim_echo({ { "-- RESIZE -- hjkl to resize, Enter or Ctrl-C to exit" } }, false, {})
     local ok, key = pcall(vim.fn.getcharstr)
-    if not ok or key == "\3" then
+    if not ok or key == "\3" or key == "\r" then
       break
     end
     if steps[key] then
