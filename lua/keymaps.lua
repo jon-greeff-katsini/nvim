@@ -8,7 +8,7 @@ local map = vim.keymap.set
 -- Custom Key Maps
 ------------------
 -- Explorer
-vim.keymap.set("n", "<leader>e", "<cmd>Telescope file_browser path=%:p:h select_buffer=true<cr>", { desc = "Open file browser" })
+vim.keymap.set("n", "<leader>e", "<cmd>Explore<cr>", { desc = "Open netrw" })
 
 -- Wrap quotes 
 -- Normal Mode (Wraps current word and returns to Normal Mode)
