@@ -9,9 +9,10 @@ vim.o.statuscolumn = '%s%#LineNr#%3{v:virtnum ? "" : v:relnum} %#RealLineNr#%-3{
 
 vim.api.nvim_create_autocmd({ 'FileType', 'TermOpen' }, {
   pattern = { 'alpha', 'netrw', 'term://*' },
-  callback = function()
+  callback = function(args)
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
-    vim.opt_local.statuscolumn = ''
+    -- Keep netrw in line with the 8-column line-number gutter on file buffers
+    vim.opt_local.statuscolumn = vim.bo[args.buf].filetype == 'netrw' and string.rep(' ', 8) or ''
   end,
 })
