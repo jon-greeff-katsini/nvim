@@ -1,3 +1,7 @@
+
+
+
+-- load keymaps
 require('keymaps')
 require('theme')
 require('lsp')
