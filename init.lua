@@ -1,6 +1,9 @@
 
 
 
+-- load options
+require('options')
+
 -- load keymaps
 require('keymaps')
 
