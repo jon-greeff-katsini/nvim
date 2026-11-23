@@ -3,12 +3,6 @@
 
 -- load keymaps
 require('keymaps')
-require('theme')
-require('lsp')
-require('finder')
-require('markdown')
-require('home')
-require('options')
-require('statusline')
-require('completion')
-require('treesitter')
+
+-- load 3rd party plugins
+require('plugins')
