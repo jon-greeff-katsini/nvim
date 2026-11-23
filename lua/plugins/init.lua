@@ -1,3 +1,4 @@
+require('plugins.alpha')
 require('plugins.telescope')
 require('plugins.tokyonight')
 require('plugins.lspconfig')
