@@ -1,3 +1,5 @@
+require('plugins.copilot')
+require('plugins.netrw')
 require('plugins.alpha')
 require('plugins.telescope')
 require('plugins.tokyonight')
