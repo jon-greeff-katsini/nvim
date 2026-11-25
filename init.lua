@@ -1,4 +1,7 @@
 
+-- load keymaps
+require('options')
+
 
 
 -- load keymaps
